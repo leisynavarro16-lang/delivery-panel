@@ -1,155 +1,313 @@
 import React, { useState, useMemo } from 'react';
-import { MapPin, Clock, Store, Truck, Package, X } from 'lucide-react';
+import { Search, Package, Clock, MapPin, X, Store } from 'lucide-react';
 
-const DeliveryPanel = () => {
+const EntelDeliveryPanel = () => {
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedComuna, setSelectedComuna] = useState('');
 
   // Datos de entregas
-  const deliveryData = [
-    // Región I - Tarapacá
-    { region: "I Tarapacá", comuna: "Alto Hospicio", deliveryRegular: "LUNES MIERCOLES VIERNES", pdv: "", nombrePdv: "", expressWeekday: "", expressSaturday: "", tienda: "Entel Alto Hospicio", direccion: "La Pampa S/N Esquina Rinconada S/N", horarioWeekday: "09:00 a 18:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4483" },
-    { region: "I Tarapacá", comuna: "Iquique", deliveryRegular: "24 HRS.", pdv: "4581", nombrePdv: "Iquique", expressWeekday: "11:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Arica", direccion: "Tarapacá 476", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 18:00", horarioSunday: "Cerrado", pdvTienda: "4581" },
-    
-    // Región II - Antofagasta
-    { region: "II Antofagasta", comuna: "Antofagasta", deliveryRegular: "48 HRS.", pdv: "4", nombrePdv: "Antofagasta", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Mall Plaza Antofagasta", direccion: "Av. Balmaceda 2355", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 18:00", horarioSunday: "Cerrado", pdvTienda: "4" },
-    { region: "II Antofagasta", comuna: "Antofagasta", deliveryRegular: "48 HRS.", pdv: "4", nombrePdv: "Antofagasta", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Antofagasta Paseo Prat", direccion: "Arturo Prat 470-474", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4401" },
-    { region: "II Antofagasta", comuna: "Calama", deliveryRegular: "48 HRS.", pdv: "4159", nombrePdv: "Calama", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Mall Plaza Calama", direccion: "Av. Balmaceda 3240", horarioWeekday: "10:30 a 21:30", horarioSaturday: "10:30 a 21:30", horarioSunday: "10:30 a 21:30", pdvTienda: "4630" },
-    { region: "II Antofagasta", comuna: "San Pedro de Atacama", deliveryRegular: "VIERNES", pdv: "", nombrePdv: "", expressWeekday: "", expressSaturday: "", tienda: "Entel San Pedro de Atacama", direccion: "Ignacio Carrera Pinto 400 4B Local 3", horarioWeekday: "09:00 a 14:00 / 15:30 a 19:00", horarioSaturday: "Cerrado", horarioSunday: "Cerrado", pdvTienda: "4632" },
-    
-    // Región III - Atacama
-    { region: "III Atacama", comuna: "Copiapo", deliveryRegular: "24 HRS.", pdv: "4861", nombrePdv: "Copiapo", expressWeekday: "11:00 hrs ; 18:00 hrs", expressSaturday: "12:00 hrs ; 18:00 hrs", tienda: "Entel Copiapó", direccion: "Maipu 110 Locales Bs:105/109/113/117/121/127", horarioWeekday: "10:00 a 20:30", horarioSaturday: "10:00 a 20:00", horarioSunday: "Cerrado", pdvTienda: "4861" },
-    { region: "III Atacama", comuna: "Vallenar", deliveryRegular: "MIERCOLES Y VIERNES", pdv: "", nombrePdv: "", expressWeekday: "", expressSaturday: "", tienda: "Entel Vallenar", direccion: "Arturo Prat 1251", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4862" },
-    
-    // Región IV - Coquimbo
-    { region: "IV Coquimbo", comuna: "Coquimbo", deliveryRegular: "24 HRS.", pdv: "4999", nombrePdv: "Coquimbo", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs; 18:00 hrs", tienda: "Entel Coquimbo", direccion: "Varela 1524 Mall Vivo Coquimbo", horarioWeekday: "10:00 a 20:00", horarioSaturday: "10:00 a 20:00", horarioSunday: "10:00 a 21:00", pdvTienda: "4999" },
-    { region: "IV Coquimbo", comuna: "La Serena", deliveryRegular: "24 HRS.", pdv: "4160", nombrePdv: "La Serena", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 15:00 hrs", tienda: "Entel La Serena Huanhuali", direccion: "Huanhuali 105", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "4160" },
-    { region: "IV Coquimbo", comuna: "La Serena", deliveryRegular: "24 HRS.", pdv: "4160", nombrePdv: "La Serena", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 15:00 hrs", tienda: "Entel La Serena Balmaceda", direccion: "Av. Balmaceda 561", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4858" },
-    { region: "IV Coquimbo", comuna: "Ovalle", deliveryRegular: "24 HRS.", pdv: "", nombrePdv: "", expressWeekday: "", expressSaturday: "", tienda: "Entel Ovalle", direccion: "Benjamin Vicuña Mackenna 115", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "4860" },
-    
-    // Región IX - La Araucanía
-    { region: "IX La Araucanía", comuna: "Temuco", deliveryRegular: "24 HRS.", pdv: "4613", nombrePdv: "Temuco Alemania", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Temuco Prat", direccion: "Arturo Prat 505", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4919" },
-    { region: "IX La Araucanía", comuna: "Temuco", deliveryRegular: "24 HRS.", pdv: "4613", nombrePdv: "Temuco Alemania", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Temuco Alemania", direccion: "Av. Alemania 610", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "4613" },
-    { region: "IX La Araucanía", comuna: "Padre Las Casas", deliveryRegular: "LUNES MIERCOLES VIERNES", pdv: "4613", nombrePdv: "Temuco Alemania", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "", direccion: "", horarioWeekday: "", horarioSaturday: "", horarioSunday: "", pdvTienda: "" },
-    
-    // Región Metropolitana
-    { region: "RM Metropolitana de Santiago", comuna: "Santiago", deliveryRegular: "24 HRS.", pdv: "395", nombrePdv: "Torre", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 14:00 hrs", tienda: "Entel Morandé", direccion: "Morandé 315", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "48" },
-    { region: "RM Metropolitana de Santiago", comuna: "Santiago", deliveryRegular: "24 HRS.", pdv: "395", nombrePdv: "Torre", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 14:00 hrs", tienda: "Torre Entel", direccion: "Amunátegui 20 Torre Entel", horarioWeekday: "09:00 a 19:00", horarioSaturday: "Cerrado", horarioSunday: "Cerrado", pdvTienda: "395" },
-    { region: "RM Metropolitana de Santiago", comuna: "Cerrillos", deliveryRegular: "24 HRS.", pdv: "395", nombrePdv: "Torre", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 14:00 hrs", tienda: "", direccion: "", horarioWeekday: "", horarioSaturday: "", horarioSunday: "", pdvTienda: "" },
-    { region: "RM Metropolitana de Santiago", comuna: "Estación Central", deliveryRegular: "24 HRS.", pdv: "395", nombrePdv: "Torre", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 14:00 hrs", tienda: "Entel Mall Plaza Oeste", direccion: "Av. Américo Vespucio 1501", horarioWeekday: "10:00 a 19:30", horarioSaturday: "10:00 a 14:00 / 15:00 a 19:30", horarioSunday: "10:00 a 14:00", pdvTienda: "4551" },
-    { region: "RM Metropolitana de Santiago", comuna: "Estación Central", deliveryRegular: "24 HRS.", pdv: "395", nombrePdv: "Torre", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 14:00 hrs", tienda: "Entel Estación Central", direccion: "San Francisco De Borja 122, Loc. B-183", horarioWeekday: "10:00 a 19:00", horarioSaturday: "09:30 a 17:00", horarioSunday: "09:30 a 17:00", pdvTienda: "5010" },
-    { region: "RM Metropolitana de Santiago", comuna: "Huechuraba", deliveryRegular: "24 HRS.", pdv: "4557", nombrePdv: "Plaza norte", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Mall Plaza Norte", direccion: "Av. Américo Vespucio 1737 B1028 / B1032 / B1036 Mall Plaza Norte", horarioWeekday: "Lu-Jue: 10:00 a 20:00 - Vie: 10:30 a 21:00", horarioSaturday: "10:30 a 21:00", horarioSunday: "11:00 a 20:00", pdvTienda: "4557" },
-    { region: "RM Metropolitana de Santiago", comuna: "La Cisterna", deliveryRegular: "24 HRS.", pdv: "115", nombrePdv: "Vespucio", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Intermodal La Cisterna", direccion: "Av. Américo Vespucio 33", horarioWeekday: "09:00 a 18:30", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "5008" },
-    { region: "RM Metropolitana de Santiago", comuna: "La Florida", deliveryRegular: "24 HRS.", pdv: "115", nombrePdv: "Vespucio", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Froilán Roa", direccion: "Froilán Roa 750", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 18:00", horarioSunday: "Cerrado", pdvTienda: "115" },
-    { region: "RM Metropolitana de Santiago", comuna: "La Florida", deliveryRegular: "24 HRS.", pdv: "115", nombrePdv: "Vespucio", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Florida Center", direccion: "Vicuña Mackenna 6100 Local 2072 Florida Center", horarioWeekday: "10:00 a 20:30", horarioSaturday: "10:00 a 20:30", horarioSunday: "10:00 a 20:30", pdvTienda: "4703" },
-    { region: "RM Metropolitana de Santiago", comuna: "La Florida", deliveryRegular: "24 HRS.", pdv: "115", nombrePdv: "Vespucio", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Mall Plaza Vespucio", direccion: "Vicuña Mackenna 7110 Mall Plaza Vespucio", horarioWeekday: "Lu-Jue: 10:00 a 20:00 - Vie: 10:30 a 21:00", horarioSaturday: "10:30 a 21:00", horarioSunday: "11:00 a 20:00", pdvTienda: "5003" },
-    { region: "RM Metropolitana de Santiago", comuna: "La Reina", deliveryRegular: "24 HRS.", pdv: "45", nombrePdv: "Manquehue", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 15:00 hrs", tienda: "", direccion: "", horarioWeekday: "", horarioSaturday: "", horarioSunday: "", pdvTienda: "" },
-    { region: "RM Metropolitana de Santiago", comuna: "Las Condes", deliveryRegular: "24 HRS.", pdv: "45", nombrePdv: "Manquehue", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 15:00 hrs", tienda: "Entel Manquehue", direccion: "Alonso De Córdova 5870 Local 7 Y 11", horarioWeekday: "Lu-Jue: 10:00 a 20:00 - Vie: 10:30 a 21:00", horarioSaturday: "10:30 a 21:00", horarioSunday: "11:00 a 20:00", pdvTienda: "45" },
-    { region: "RM Metropolitana de Santiago", comuna: "Las Condes", deliveryRegular: "24 HRS.", pdv: "45", nombrePdv: "Manquehue", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 15:00 hrs", tienda: "Entel Mall Plaza Los Dominicos", direccion: "Av. Padre Hurtado Sur 865 Oficina Bs-1464 Y Bs-1468 Mall Plaza Los Dominicos", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "4556" },
-    { region: "RM Metropolitana de Santiago", comuna: "Las Condes", deliveryRegular: "24 HRS.", pdv: "45", nombrePdv: "Manquehue", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 15:00 hrs", tienda: "Entel Alto Las Condes", direccion: "Av. Presidente Kennedy 9001 Local 1147 Alto Las Condes", horarioWeekday: "10:00 a 20:30", horarioSaturday: "10:00 a 20:30", horarioSunday: "10:00 a 20:30", pdvTienda: "5142" },
-    { region: "RM Metropolitana de Santiago", comuna: "Lo Barnechea", deliveryRegular: "24 HRS.", pdv: "4692", nombrePdv: "La dehesa", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "Cerrado", tienda: "Entel La Dehesa", direccion: "Av. La Dehesa 1450 Local 16A-16B", horarioWeekday: "10:00 a 20:30", horarioSaturday: "10:00 a 20:00", horarioSunday: "10:00 a 20:00", pdvTienda: "4692" },
-    { region: "RM Metropolitana de Santiago", comuna: "Maipú", deliveryRegular: "24 HRS.", pdv: "5245", nombrePdv: "Maipu plaza", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 14:00 hrs", tienda: "Entel Maipú Plaza", direccion: "Av. Los Pajaritos 1960, Loc. 101", horarioWeekday: "10:00 A 20:30", horarioSaturday: "10:00 A 20:30", horarioSunday: "11:00 A 20:00", pdvTienda: "5245" },
-    { region: "RM Metropolitana de Santiago", comuna: "Ñuñoa", deliveryRegular: "24 HRS.", pdv: "115", nombrePdv: "Vespucio", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Portal Ñuñoa", direccion: "Av. Jose Pedro Alessandri 1166 4008 Mall Portal Ñuñoa", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 18:00", horarioSunday: "Cerrado", pdvTienda: "5176" },
-    { region: "RM Metropolitana de Santiago", comuna: "Peñalolén", deliveryRegular: "24 HRS.", pdv: "115", nombrePdv: "Vespucio", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "", direccion: "", horarioWeekday: "", horarioSaturday: "", horarioSunday: "", pdvTienda: "" },
-    { region: "RM Metropolitana de Santiago", comuna: "Providencia", deliveryRegular: "24 HRS.", pdv: "45", nombrePdv: "Manquehue", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 15:00 hrs", tienda: "Entel Costanera Center", direccion: "Av. Andres Bello 2465 Local 176 Costanera Center", horarioWeekday: "10:00 a 21:00", horarioSaturday: "10:00 a 20:00", horarioSunday: "10:00 a 20:00", pdvTienda: "5141" },
-    { region: "RM Metropolitana de Santiago", comuna: "Providencia", deliveryRegular: "24 HRS.", pdv: "45", nombrePdv: "Manquehue", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 15:00 hrs", tienda: "Entel Luis Thayer Ojeda", direccion: "Av. Luis Thayer Ojeda 0173", horarioWeekday: "10:00 a 14:00 / 15:00 a 19:00", horarioSaturday: "Cerrado", horarioSunday: "Cerrado", pdvTienda: "4540" },
-    { region: "RM Metropolitana de Santiago", comuna: "Puente Alto", deliveryRegular: "24 HRS.", pdv: "115", nombrePdv: "Vespucio", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Puente Alto", direccion: "Av. Concha y Toro 1080 Local 23-24", horarioWeekday: "09:00 a 18:00", horarioSaturday: "Cerrado", horarioSunday: "Cerrado", pdvTienda: "4544" },
-    { region: "RM Metropolitana de Santiago", comuna: "Puente Alto", deliveryRegular: "24 HRS.", pdv: "115", nombrePdv: "Vespucio", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Plaza Puente Alto", direccion: "Av. Concha y Toro 187", horarioWeekday: "09:00 a 18:00", horarioSaturday: "Cerrado", horarioSunday: "Cerrado", pdvTienda: "4545" },
-    { region: "RM Metropolitana de Santiago", comuna: "Puente Alto", deliveryRegular: "24 HRS.", pdv: "115", nombrePdv: "Vespucio", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Mall Plaza Tobalaba", direccion: "Av. Camilo Henriquez N° 3296 Loc. Bh 184-188", horarioWeekday: "10:00 a 19:30", horarioSaturday: "10:00 a 17:00", horarioSunday: "10:00 a 14:00", pdvTienda: "5207" },
-    { region: "RM Metropolitana de Santiago", comuna: "San Bernardo", deliveryRegular: "24 HRS.", pdv: "4177", nombrePdv: "San bernardo", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "Cerrado", tienda: "Entel San Bernardo", direccion: "Eyzaguirre 657", horarioWeekday: "09:00 a 19:00", horarioSaturday: "Cerrado", horarioSunday: "Cerrado", pdvTienda: "4177" },
-    { region: "RM Metropolitana de Santiago", comuna: "San Bernardo", deliveryRegular: "24 HRS.", pdv: "4177", nombrePdv: "San bernardo", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "Cerrado", tienda: "Entel Mall Plaza Sur", direccion: "Av. Pdte. Jorge Alessandri Rodríguez 20040 Local Df 134A Mall Plaza Sur", horarioWeekday: "10:00 a 21:00", horarioSaturday: "10:00 a 20:00", horarioSunday: "10:00 a 20:00", pdvTienda: "4540" },
-    { region: "RM Metropolitana de Santiago", comuna: "Peñaflor", deliveryRegular: "24 HRS.", pdv: "5207", nombrePdv: "Peñaflor", expressWeekday: "12:30 hrs ; 14:00 hrs15:00 hrs ; 18:00 hrs", expressSaturday: "Cerrado", tienda: "Entel Peñaflor", direccion: "18 DE September 12", horarioWeekday: "09:30 A 14:00 / 15:00 A 18:30", horarioSaturday: "10:00 A 14:00", horarioSunday: "Cerrado", pdvTienda: "5053" },
-    
-    // Región V - Valparaíso
-    { region: "V Valparaíso", comuna: "Valparaiso", deliveryRegular: "24 HRS.", pdv: "4863", nombrePdv: "Viña arlegui", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Valparaíso Montt", direccion: "Pedro Montt 1811", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "3807" },
-    { region: "V Valparaíso", comuna: "Viña del Mar", deliveryRegular: "24 HRS.", pdv: "4863", nombrePdv: "Viña arlegui", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Viña del Mar Coraceros", direccion: "Av. Libertad 1405", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "4613" },
-    { region: "V Valparaíso", comuna: "Viña del Mar", deliveryRegular: "24 HRS.", pdv: "4863", nombrePdv: "Viña arlegui", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel e-service Viña del Mar", direccion: "Av. Libertad 1405 2° Piso E-Service", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "1884" },
-    { region: "V Valparaíso", comuna: "Viña del Mar", deliveryRegular: "24 HRS.", pdv: "4863", nombrePdv: "Viña arlegui", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Viña del Mar Arlegui", direccion: "Arlegui 561", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4863" },
-    { region: "V Valparaíso", comuna: "Quilpue", deliveryRegular: "24 HRS.", pdv: "4149", nombrePdv: "Quilpue", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 15:00 hrs", tienda: "Entel Quilpué", direccion: "Diego Portales 822 Local 209 Mall Plaza del Sol", horarioWeekday: "09:30 a 19:00", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "4149" },
-    { region: "V Valparaíso", comuna: "San Antonio", deliveryRegular: "24 HRS.", pdv: "5184", nombrePdv: "San Antonio", expressWeekday: "11:00 hrs ; 18:00 hrs", expressSaturday: "Cerrado", tienda: "Entel Arauco San Antonio", direccion: "BARROS LUCO 105 MALL ARAUCO SAN ANTONIO PISO 2", horarioWeekday: "10:00 a 19:00", horarioSaturday: "10:00 a 19:00", horarioSunday: "11:00 a 19:00", pdvTienda: "5184" },
-    
-    // Región VI - O'Higgins
-    { region: "VI Libertador General Bernardo O'Higgins", comuna: "Rancagua", deliveryRegular: "24 HRS.", pdv: "5126", nombrePdv: "Rancagua", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs; 18:00 hrs", tienda: "Entel Rancagua", direccion: "Paseo Independencia 486", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4161" },
-    { region: "VI Libertador General Bernardo O'Higgins", comuna: "Rancagua", deliveryRegular: "24 HRS.", pdv: "5126", nombrePdv: "Rancagua", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs; 18:00 hrs", tienda: "Entel Portal Rancagua", direccion: "Carretera del Cobre 750 Local 1101", horarioWeekday: "10:00 a 20:00", horarioSaturday: "10:00 a 20:00", horarioSunday: "10:00 a 20:00", pdvTienda: "10" },
-    
-    // Región VII - Maule
-    { region: "VII Maule", comuna: "Curico", deliveryRegular: "24 HRS.", pdv: "4165", nombrePdv: "Curico", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Curicó", direccion: "Av. Camilo Henríquez 297", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4165" },
-    { region: "VII Maule", comuna: "Curico", deliveryRegular: "24 HRS.", pdv: "4165", nombrePdv: "Curico", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Curicó O'Higgins", direccion: "Av. Bernardo O'Higgins 201 Local 71B", horarioWeekday: "10:00 a 19:00", horarioSaturday: "09:30 a 20:00", horarioSunday: "10:00 a 20:00", pdvTienda: "4628" },
-    { region: "VII Maule", comuna: "Linares", deliveryRegular: "24 HRS.", pdv: "4620", nombrePdv: "Linares independencia", expressWeekday: "11:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 15:00 hrs", tienda: "Entel Linares", direccion: "Independencia 496", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "4620" },
-    { region: "VII Maule", comuna: "Talca", deliveryRegular: "24 HRS.", pdv: "4172", nombrePdv: "Talca", expressWeekday: "10:00 hrs ; 17:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Talca Plaza Maule", direccion: "Av Circunvalación Oriente 1055", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 19:00", horarioSunday: "Cerrado", pdvTienda: "4172" },
-    { region: "VII Maule", comuna: "Talca", deliveryRegular: "24 HRS.", pdv: "4172", nombrePdv: "Talca", expressWeekday: "10:00 hrs ; 17:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Talca Centro", direccion: "Calle 1 Sur 1320", horarioWeekday: "09:00 a 17:00", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "435" },
-    
-    // Región VIII - Biobío
-    { region: "VIII Biobío", comuna: "Concepción", deliveryRegular: "24 HRS.", pdv: "25", nombrePdv: "Concepción chacabuco", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 14:00 hrs", tienda: "Entel Concepción Chacabuco", direccion: "Av. Chacabuco 667", horarioWeekday: "09:00 a 19:00", horarioSaturday: "Cerrado", horarioSunday: "Cerrado", pdvTienda: "25" },
-    { region: "VIII Biobío", comuna: "Concepción", deliveryRegular: "24 HRS.", pdv: "25", nombrePdv: "Concepción chacabuco", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 14:00 hrs", tienda: "Entel Concepción O'Higgins", direccion: "Libertador Gral. Bernardo O'Higgins 920", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4577" },
-    { region: "VIII Biobío", comuna: "Chillán", deliveryRegular: "24 HRS.", pdv: "4169", nombrePdv: "Chillán", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 16:00 hrs", tienda: "Entel Chillán", direccion: "El Roble 628", horarioWeekday: "10:00 a 19:00", horarioSaturday: "10:00 a 16:00", horarioSunday: "Cerrado", pdvTienda: "4169" },
-    { region: "VIII Biobío", comuna: "Chillán", deliveryRegular: "24 HRS.", pdv: "4169", nombrePdv: "Chillán", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 16:00 hrs", tienda: "Entel Mall Arauco Chillán", direccion: "El Roble 770 Local 115 Mall Arauco Chillán", horarioWeekday: "10:00 a 20:00", horarioSaturday: "10:00 a 20:00", horarioSunday: "11:00 a 20:00", pdvTienda: "4651" },
-    { region: "VIII Biobío", comuna: "Los Angeles", deliveryRegular: "24 HRS.", pdv: "4167", nombrePdv: "Los Ángeles", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Los Ángeles", direccion: "Valdivia 440", horarioWeekday: "09:00 a 19:00", horarioSaturday: "Cerrado", horarioSunday: "Cerrado", pdvTienda: "4167" },
-    { region: "VIII Biobío", comuna: "Los Angeles", deliveryRegular: "24 HRS.", pdv: "4167", nombrePdv: "Los Ángeles", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Mall Plaza Los Ángeles", direccion: "Illapel 10 Local 230 Mall Paseo Costanera", horarioWeekday: "10:00 a 20:00", horarioSaturday: "10:00 a 20:00", horarioSunday: "11:00 a 20:00", pdvTienda: "4579" },
-    { region: "VIII Biobío", comuna: "Talcahuano", deliveryRegular: "24 HRS.", pdv: "4564", nombrePdv: "Talcahuano", expressWeekday: "12:00 hrs; 18:00 hrs", expressSaturday: "12:00 hrs ; 18:00 hrs", tienda: "Entel Talcahuano", direccion: "Av. Pdte. Jorge Alessandri Rodríguez 3177", horarioWeekday: "09:00 a 20:00", horarioSaturday: "10:00 a 19:00", horarioSunday: "10:00 a 20:00", pdvTienda: "4564" },
-    
-    // Región X - Los Lagos
-    { region: "X Los Lagos", comuna: "Osorno", deliveryRegular: "24 HRS.", pdv: "5159", nombrePdv: "Osorno ohiggins", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Osorno O'Higgins", direccion: "San Bernardo 555", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 17:00", horarioSunday: "Cerrado", pdvTienda: "5159" },
-    { region: "X Los Lagos", comuna: "Puerto Montt", deliveryRegular: "48 HRS.", pdv: "37", nombrePdv: "Puerto Montt", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "Cerrado", tienda: "Entel Puerto Montt", direccion: "Eleuterio Ramírez 240 Piso 3", horarioWeekday: "10:00 a 20:00", horarioSaturday: "10:00 a 19:00", horarioSunday: "11:00 a 20:00", pdvTienda: "4568" },
-    { region: "X Los Lagos", comuna: "Puerto Montt", deliveryRegular: "48 HRS.", pdv: "37", nombrePdv: "Puerto Montt", expressWeekday: "09:00 hrs ; 18:00 hrs", expressSaturday: "Cerrado", tienda: "Entel Mall Paseo Costanera", direccion: "Eleuterio Ramírez 294", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4608" },
-    
-    // Región XII - Magallanes
-    { region: "XII Magallanes y de la Antártica Chilena", comuna: "Punta Arenas", deliveryRegular: "72 HRS.", pdv: "5035", nombrePdv: "Punta Arenas", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "Cerrado", tienda: "Entel Punta Arenas", direccion: "Lautaro Navarro 957", horarioWeekday: "09:00 A 13:30 / 14:30 A 19:00", horarioSaturday: "Cerrado", horarioSunday: "Cerrado", pdvTienda: "5035" },
-    
-    // Región XIV - Los Ríos
-    { region: "XIV Los Ríos", comuna: "Valdivia", deliveryRegular: "24 HRS.", pdv: "4569", nombrePdv: "Valdivia Arauco", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 13:00 hrs", tienda: "Entel Valdivia", direccion: "Arauco 165", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 14:00", horarioSunday: "Cerrado", pdvTienda: "4569" },
-    
-    // Región XV - Arica y Parinacota
-    { region: "XV Arica y Parinacota", comuna: "Arica", deliveryRegular: "48 HRS.", pdv: "4480", nombrePdv: "Arica", expressWeekday: "10:00 hrs ; 18:00 hrs", expressSaturday: "10:00 hrs ; 17:00 hrs", tienda: "Entel Arica", direccion: "21 de Mayo 270", horarioWeekday: "09:00 a 19:00", horarioSaturday: "10:00 a 18:00", horarioSunday: "Cerrado", pdvTienda: "4480" }
+  const deliveryData = {
+    "I-Tarapacá-Alto Hospicio": {
+      regular: "LUNES MIERCOLES VIERNES",
+      express: null,
+      stores: []
+    },
+    "I-Tarapacá-Iquique": {
+      regular: "24 HRS.",
+      express: { pdv: "4581", nombre: "Iquique", horarios: { lv: "11:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 17:00 hrs" }},
+      stores: [
+        { pdv: "4581", nombre: "Entel Arica", direccion: "Tarapacá 476", horarios: { lv: "09:00 a 19:00", s: "10:00 a 18:00", d: "Cerrado" }},
+        { pdv: "4483", nombre: "Entel Iquique", direccion: "La Pampa S/N Esquina Rinconada S/N", horarios: { lv: "09:00 a 18:00", s: "10:00 a 14:00", d: "Cerrado" }}
+      ]
+    },
+    "II-Antofagasta-Antofagasta": {
+      regular: "48 HRS.",
+      express: null,
+      stores: [
+        { pdv: "4", nombre: "Entel Mall Plaza Antofagasta", direccion: "Av. Balmaceda 2355", horarios: { lv: "09:00 a 19:00", s: "10:00 a 18:00", d: "Cerrado" }},
+        { pdv: "4401", nombre: "Entel Antofagasta Paseo Prat", direccion: "Arturo Prat 470-474", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }}
+      ]
+    },
+    "II-Antofagasta-Calama": {
+      regular: "48 HRS.",
+      express: { pdv: "4159", nombre: "Calama", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 13:00 hrs" }},
+      stores: [
+        { pdv: "4630", nombre: "Entel Mall Plaza Calama", direccion: "Av. Balmaceda 3240", horarios: { lv: "10:30 a 21:30", s: "10:30 a 21:30", d: "10:30 a 21:30" }}
+      ]
+    },
+    "II-Antofagasta-San Pedro de Atacama": {
+      regular: "VIERNES",
+      express: null,
+      stores: [
+        { pdv: "4632", nombre: "Entel San Pedro de Atacama", direccion: "Ignacio Carrera Pinto 400 4B Local 3", horarios: { lv: "09:00 a 14:00 / 15:30 a 19:00", s: "Cerrado", d: "Cerrado" }}
+      ]
+    },
+    "III-Atacama-Copiapo": {
+      regular: "24 HRS.",
+      express: { pdv: "4861", nombre: "Copiapo", horarios: { lv: "11:00 hrs ; 18:00 hrs", s: "12:00 hrs ; 18:00 hrs" }},
+      stores: [
+        { pdv: "4861", nombre: "Entel Copiapó", direccion: "Maipu 110 Locales Bs:105/109/113/117/121/127", horarios: { lv: "10:00 a 20:30", s: "10:00 a 20:00", d: "Cerrado" }}
+      ]
+    },
+    "III-Atacama-Vallenar": {
+      regular: "MIERCOLES Y VIERNES",
+      express: null,
+      stores: [
+        { pdv: "4862", nombre: "Entel Vallenar", direccion: "Arturo Prat 1251", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }}
+      ]
+    },
+    "IV-Coquimbo-La Serena": {
+      regular: "24 HRS.",
+      express: { pdv: "4160", nombre: "La Serena", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 15:00 hrs" }},
+      stores: [
+        { pdv: "4160", nombre: "Entel La Serena Huanhuali", direccion: "Huanhuali 105", horarios: { lv: "09:00 a 19:00", s: "10:00 a 16:00", d: "Cerrado" }},
+        { pdv: "4858", nombre: "Entel La Serena Balmaceda", direccion: "Av. Balmaceda 561", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }}
+      ]
+    },
+    "IV-Coquimbo-Coquimbo": {
+      regular: "24 HRS.",
+      express: { pdv: "4999", nombre: "Coquimbo", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs; 18:00 hrs" }},
+      stores: [
+        { pdv: "4999", nombre: "Entel Coquimbo", direccion: "Varela 1524 Mall Vivo Coquimbo", horarios: { lv: "10:00 a 20:00", s: "10:00 a 20:00", d: "10:00 a 21:00" }}
+      ]
+    },
+    "IV-Coquimbo-Ovalle": {
+      regular: "24 HRS.",
+      express: null,
+      stores: [
+        { pdv: "4860", nombre: "Entel Ovalle", direccion: "Benjamin Vicuña Mackenna 115", horarios: { lv: "09:00 a 19:00", s: "10:00 a 16:00", d: "Cerrado" }}
+      ]
+    },
+    "IX-La Araucanía-Temuco": {
+      regular: "24 HRS.",
+      express: { pdv: "4613", nombre: "Temuco Alemania", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 13:00 hrs" }},
+      stores: [
+        { pdv: "3807", nombre: "Entel Valparaíso Montt", direccion: "Arturo Prat 505", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }},
+        { pdv: "4613", nombre: "Entel Viña del Mar Coraceros", direccion: "Av. Alemania 610", horarios: { lv: "09:00 a 19:00", s: "10:00 a 16:00", d: "Cerrado" }}
+      ]
+    },
+    "IX-La Araucanía-Padre Las Casas": {
+      regular: "LUNES MIERCOLES VIERNES",
+      express: { pdv: "4613", nombre: "Temuco Alemania", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 13:00 hrs" }},
+      stores: []
+    },
+    "RM-Metropolitana de Santiago-Santiago": {
+      regular: "24 HRS.",
+      express: { pdv: "395", nombre: "Torre", horarios: { lv: "09:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 14:00 hrs" }},
+      stores: [
+        { pdv: "48", nombre: "Entel Morandé", direccion: "Morandé 315", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }},
+        { pdv: "395", nombre: "Torre Entel", direccion: "Amunátegui 20 Torre Entel", horarios: { lv: "09:00 a 19:00", s: "Cerrado", d: "Cerrado" }}
+      ]
+    },
+    "RM-Metropolitana de Santiago-Las Condes": {
+      regular: "24 HRS.",
+      express: { pdv: "45", nombre: "Manquehue", horarios: { lv: "09:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 15:00 hrs" }},
+      stores: [
+        { pdv: "45", nombre: "Entel Manquehue", direccion: "Alonso De Córdova 5870 Local 7 Y 11", horarios: { lv: "09:00 a 19:00", s: "10:00 a 16:00", d: "Cerrado" }},
+        { pdv: "4556", nombre: "Entel Mall Plaza Los Dominicos", direccion: "Av. Padre Hurtado Sur 865 Oficina Bs-1464 Y Bs-1468", horarios: { lv: "Lu-Jue: 10:00 a 20:00 - Vie: 10:30 a 21:00", s: "10:30 a 21:00", d: "11:00 a 20:00" }},
+        { pdv: "5123", nombre: "Entel Alto Las Condes", direccion: "Av. Presidente Kennedy 9001 Local 1147", horarios: { lv: "10:00 a 20:30", s: "10:00 a 20:30", d: "10:00 a 20:30" }}
+      ]
+    },
+    "RM-Metropolitana de Santiago-Providencia": {
+      regular: "24 HRS.",
+      express: { pdv: "45", nombre: "Manquehue", horarios: { lv: "09:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 15:00 hrs" }},
+      stores: [
+        { pdv: "4144", nombre: "Entel Luis Thayer Ojeda", direccion: "Av. Luis Thayer Ojeda 0173", horarios: { lv: "10:00 a 14:00 / 15:00 a 19:00", s: "Cerrado", d: "Cerrado" }}
+      ]
+    },
+    "RM-Metropolitana de Santiago-Maipú": {
+      regular: "24 HRS.",
+      express: { pdv: "5245", nombre: "Maipu plaza", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 14:00 hrs" }},
+      stores: [
+        { pdv: "4199", nombre: "Entel Maipú", direccion: "Av. Los Pajaritos 1960, Loc. 101", horarios: { lv: "09:00 a 18:00", s: "Cerrado", d: "Cerrado" }},
+        { pdv: "5245", nombre: "Entel Maipú Plaza", direccion: "AV. AMÉRICO VESPUCIO 399", horarios: { lv: "10:00 A 20:30", s: "10:00 A 20:30", d: "11:00 A 20:00" }}
+      ]
+    },
+    "RM-Metropolitana de Santiago-La Florida": {
+      regular: "24 HRS.",
+      express: { pdv: "115", nombre: "Vespucio", horarios: { lv: "09:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 17:00 hrs" }},
+      stores: [
+        { pdv: "115", nombre: "Entel Mall Plaza Vespucio", direccion: "Vicuña Mackenna 7110 Mall Plaza Vespucio", horarios: { lv: "10:00 a 20:30", s: "10:00 a 20:30", d: "10:00 a 20:30" }},
+        { pdv: "4703", nombre: "Entel Florida Center", direccion: "Vicuña Mackenna 6100 Local 2072 Florida Center", horarios: { lv: "09:00 a 19:00", s: "10:00 a 18:00", d: "Cerrado" }}
+      ]
+    },
+    "V-Valparaíso-Valparaiso": {
+      regular: "24 HRS.",
+      express: { pdv: "4863", nombre: "Viña arlegui", horarios: { lv: "09:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 13:00 hrs" }},
+      stores: [
+        { pdv: "4161", nombre: "Entel Valparaíso", direccion: "Pedro Montt 1811", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }}
+      ]
+    },
+    "V-Valparaíso-Viña del Mar": {
+      regular: "24 HRS.",
+      express: { pdv: "4863", nombre: "Viña arlegui", horarios: { lv: "09:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 13:00 hrs" }},
+      stores: [
+        { pdv: "10", nombre: "Entel e-service Viña del Mar", direccion: "Av. Libertad 1405", horarios: { lv: "09:00 a 19:00", s: "10:00 a 16:00", d: "Cerrado" }},
+        { pdv: "4756", nombre: "Entel Viña del Mar", direccion: "Av. Libertad 1405 2° Piso E-Service", horarios: { lv: "09:00 a 19:00", s: "10:00 a 16:00", d: "Cerrado" }},
+        { pdv: "4863", nombre: "Entel Viña Arlegui", direccion: "Arlegui 561", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }}
+      ]
+    },
+    "V-Valparaíso-Quilpue": {
+      regular: "24 HRS.",
+      express: { pdv: "4149", nombre: "Quilpue", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 15:00 hrs" }},
+      stores: [
+        { pdv: "4149", nombre: "Entel Quilpué", direccion: "Diego Portales 822 Local 209 Mall Plaza del Sol", horarios: { lv: "09:30 a 19:00", s: "10:00 a 16:00", d: "Cerrado" }}
+      ]
+    },
+    "V-Valparaíso-San Antonio": {
+      regular: "24 HRS.",
+      express: { pdv: "5184", nombre: "San Antonio", horarios: { lv: "11:00 hrs ; 18:00 hrs", s: "Cerrado" }},
+      stores: [
+        { pdv: "5184", nombre: "Entel San Antonio", direccion: "BARROS LUCO 105 MALL ARAUCO SAN ANTONIO PISO 2", horarios: { lv: "10:00 a 19:00", s: "10:00 a 19:00", d: "11:00 a 19:00" }}
+      ]
+    },
+    "VI-Libertador General Bernardo O'Higgins-Rancagua": {
+      regular: "24 HRS.",
+      express: { pdv: "5126", nombre: "Rancagua", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs; 18:00 hrs" }},
+      stores: [
+        { pdv: "4161", nombre: "Entel Rancagua", direccion: "Paseo Independencia 486", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }},
+        { pdv: "5126", nombre: "Entel Portal Rancagua", direccion: "Carretera del Cobre 750 Local 1101", horarios: { lv: "10:00 a 20:00", s: "10:00 a 20:00", d: "10:00 a 20:00" }}
+      ]
+    },
+    "VII-Maule-Talca": {
+      regular: "24 HRS.",
+      express: { pdv: "4172", nombre: "Talca", horarios: { lv: "10:00 hrs ; 17:00 hrs", s: "10:00 hrs ; 13:00 hrs" }},
+      stores: [
+        { pdv: "4172", nombre: "Entel Talca Centro", direccion: "Av. Chacabuco 667", horarios: { lv: "09:00 a 19:00", s: "10:00 a 19:00", d: "Cerrado" }}
+      ]
+    },
+    "VII-Maule-Curico": {
+      regular: "24 HRS.",
+      express: { pdv: "4165", nombre: "Curico", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 13:00 hrs" }},
+      stores: [
+        { pdv: "4165", nombre: "Entel Curicó", direccion: "Av. Camilo Henríquez 297", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }},
+        { pdv: "4628", nombre: "Entel Curicó O'Higgins", direccion: "Av. Bernardo O'Higgins 201 Local 71B", horarios: { lv: "10:00 a 19:00", s: "09:30 a 20:00", d: "10:00 a 20:00" }}
+      ]
+    },
+    "VII-Maule-Linares": {
+      regular: "24 HRS.",
+      express: { pdv: "4620", nombre: "Linares independencia", horarios: { lv: "11:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 15:00 hrs" }},
+      stores: [
+        { pdv: "4620", nombre: "Entel Linares", direccion: "Independencia 496", horarios: { lv: "09:00 a 19:00", s: "10:00 a 16:00", d: "Cerrado" }}
+      ]
+    },
+    "VIII-Biobío-Concepcion": {
+      regular: "24 HRS.",
+      express: { pdv: "25", nombre: "Concepción chacabuco", horarios: { lv: "09:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 14:00 hrs" }},
+      stores: [
+        { pdv: "25", nombre: "Entel Concepción Chacabuco", direccion: "Av. Chacabuco 667", horarios: { lv: "09:00 A 19:00", s: "10:00 A 14:00", d: "Cerrado" }},
+        { pdv: "4577", nombre: "Entel Concepción O'Higgins", direccion: "Libertador Gral. Bernardo O'Higgins 920", horarios: { lv: "09:00 A 19:00", s: "10:00 A 14:00", d: "Cerrado" }}
+      ]
+    },
+    "VIII-Biobío-Chillan": {
+      regular: "24 HRS.",
+      express: { pdv: "4169", nombre: "Chillán", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 16:00 hrs" }},
+      stores: [
+        { pdv: "4169", nombre: "Entel Chillán", direccion: "El Roble 628", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }},
+        { pdv: "4651", nombre: "Entel Mall Arauco Chillán", direccion: "El Roble 770 Local 115", horarios: { lv: "10:00 a 20:00", s: "10:00 a 20:00", d: "11:00 a 20:00" }}
+      ]
+    },
+    "VIII-Biobío-Los Angeles": {
+      regular: "24 HRS.",
+      express: { pdv: "4167", nombre: "Los Ángeles", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 13:00 hrs" }},
+      stores: [
+        { pdv: "4167", nombre: "Entel Los Ángeles", direccion: "Lautaro 350", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }},
+        { pdv: "4579", nombre: "Entel Mall Plaza Los Ángeles", direccion: "Illapel 10 Local 230 Mall Paseo Costanera", horarios: { lv: "10:00 a 20:00", s: "10:00 a 20:00", d: "11:00 a 20:00" }}
+      ]
+    },
+    "VIII-Biobío-Talcahuano": {
+      regular: "24 HRS.",
+      express: { pdv: "4564", nombre: "Talcahuano", horarios: { lv: "12:00 hrs; 18:00 hrs", s: "12:00 hrs ; 18:00 hrs" }},
+      stores: [
+        { pdv: "4564", nombre: "Entel Talcahuano", direccion: "Av. Pdte. Jorge Alessandri Rodríguez 3177", horarios: { lv: "09:00 a 20:00", s: "10:00 a 19:00", d: "10:00 a 20:00" }}
+      ]
+    },
+    "X-Los Lagos-Osorno": {
+      regular: "24 HRS.",
+      express: { pdv: "5159", nombre: "Osorno ohiggins", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 13:00 hrs" }},
+      stores: [
+        { pdv: "5159", nombre: "Entel Osorno O'Higgins", direccion: "Bernardo O'Higgins 577", horarios: { lv: "09:00 a 19:00", s: "Cerrado", d: "Cerrado" }}
+      ]
+    },
+    "X-Los Lagos-Puerto Montt": {
+      regular: "48 HRS.",
+      express: { pdv: "37", nombre: "Puerto Montt", horarios: { lv: "09:00 hrs ; 18:00 hrs", s: "Cerrado" }},
+      stores: [
+        { pdv: "37", nombre: "Entel Puerto Montt", direccion: "Benavente 536", horarios: { lv: "09:00 a 19:00", s: "Cerrado", d: "Cerrado" }},
+        { pdv: "4568", nombre: "Entel Mall Paseo Costanera", direccion: "Illapel 10 Local 230 Mall Paseo Costanera", horarios: { lv: "10:00 a 20:00", s: "10:00 a 20:00", d: "11:00 a 20:00" }}
+      ]
+    },
+    "XII-Magallanes y de la Antártica Chilena-Punta Arenas": {
+      regular: "72 HRS.",
+      express: { pdv: "5035", nombre: "Punta Arenas", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "Cerrado" }},
+      stores: [
+        { pdv: "5035", nombre: "Entel Punta Arenas", direccion: "Lautaro Navarro 957", horarios: { lv: "09:00 a 19:00", s: "Cerrado", d: "Cerrado" }}
+      ]
+    },
+    "XIV-Los Ríos-Valdivia": {
+      regular: "24 HRS.",
+      express: { pdv: "4569", nombre: "Valdivia Arauco", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 13:00 hrs" }},
+      stores: [
+        { pdv: "4569", nombre: "Entel Valdivia", direccion: "Arauco 165", horarios: { lv: "09:00 a 19:00", s: "10:00 a 14:00", d: "Cerrado" }}
+      ]
+    },
+    "XV-Arica y Parinacota-Arica": {
+      regular: "48 HRS.",
+      express: { pdv: "4480", nombre: "Arica", horarios: { lv: "10:00 hrs ; 18:00 hrs", s: "10:00 hrs ; 17:00 hrs" }},
+      stores: [
+        { pdv: "4480", nombre: "Entel Arauco San Antonio", direccion: "Martínez De Rozas 603", horarios: { lv: "09:00 a 18:00", s: "10:00 a 14:00", d: "Cerrado" }}
+      ]
+    }
+  };
+
+  const regiones = [
+    "I - Tarapacá",
+    "II - Antofagasta",
+    "III - Atacama",
+    "IV - Coquimbo",
+    "V - Valparaíso",
+    "VI - Libertador General Bernardo O'Higgins",
+    "VII - Maule",
+    "VIII - Biobío",
+    "IX - La Araucanía",
+    "X - Los Lagos",
+    "XI - Aysén del General Carlos Ibáñez del Campo",
+    "XII - Magallanes y de la Antártica Chilena",
+    "XIV - Los Ríos",
+    "XV - Arica y Parinacota",
+    "RM - Metropolitana de Santiago"
   ];
 
-  // Obtener regiones únicas
-  const regiones = useMemo(() => {
-    const uniqueRegions = [...new Set(deliveryData.map(item => item.region))];
-    return uniqueRegions.sort();
-  }, []);
+  const comunasPorRegion = {
+    "I - Tarapacá": ["Alto Hospicio", "Camiña", "Colchane", "Huara", "Iquique", "Pica", "Pozo Almonte"],
+    "II - Antofagasta": ["Antofagasta", "Calama", "María Elena", "Mejillones", "Ollagüe", "San Pedro de Atacama", "Sierra Gorda", "Taltal", "Tocopilla"],
+    "III - Atacama": ["Alto del Carmen", "Caldera", "Chañaral", "Copiapo", "Diego de Almagro", "Freirina", "Huasco", "Tierra Amarilla", "Vallenar"],
+    "IV - Coquimbo": ["Andacollo", "Canela", "Combarbalá", "Coquimbo", "Illapel", "La Higuera", "La Serena", "Los Vilos", "Monte Patria", "Ovalle", "Paihuano", "Punitaqui", "Río Hurtado", "Salamanca", "Vicuña"],
+    "V - Valparaíso": ["Algarrobo", "Cabildo", "Calera", "Calle Larga", "Cartagena", "Casablanca", "Catemu", "Concon", "El Quisco", "El Tabo", "Hijuelas", "Isla de Pascua", "Juan Fernández", "La Cruz", "La Ligua", "Limache", "Llaillay", "Los Andes", "Nogales", "Olmue", "Panquehue", "Papudo", "Petorca", "Puchuncaví", "Putaendo", "Quillota", "Quilpue", "Quintero", "Rinconada", "San Antonio", "San Esteban", "San Felipe", "Santa María", "Santo Domingo", "Valparaiso", "Villa Alemana", "Viña del Mar", "Zapallar"],
+    "VI - Libertador General Bernardo O'Higgins": ["Chépica", "Chimbarongo", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "La Estrella", "Las Cabras", "Litueche", "Lolol", "Machalí", "Malloa", "Marchihue", "Mostazal", "Nancagua", "Navidad", "Olivar", "Palmilla", "Paredones", "Peralillo", "Peumo", "Pichidegua", "Pichilemu", "Placilla", "Pumanque", "Quinta de Tilcoco", "Rancagua", "Rengo", "Requínoa", "San Fernando", "San Vicente", "Santa Cruz"],
+    "VII - Maule": ["Cauquenes", "Chanco", "Colbún", "Constitucion", "Curepto", "Curico", "Empedrado", "Hualañé", "Licantén", "Linares", "Longaví", "Maule", "Molina", "Parral", "Pelarco", "Pelluhue", "Pencahue", "Rauco", "Retiro", "Río Claro", "Romeral", "Sagrada Familia", "San Clemente", "San Javier", "San Rafael", "Talca", "Teno", "Vichuquén", "Villa Alegre", "Yerbas Buenas"],
+    "VIII - Biobío": ["Alto Biobío", "Antuco", "Arauco", "Bulnes", "Cabrero", "Canete", "Chiguayante", "Chillan", "Chillan Viejo", "Cobquecura", "Coelemu", "Coihueco", "Concepcion", "Contulmo", "Coronel", "Curanilahue", "El Carmen", "Florida", "Hualpen", "Hualqui", "Laja", "Lebu", "Los Álamos", "Los Angeles", "Lota", "Mulchen", "Nacimiento", "Negrete", "Ninhue", "Ñiquén", "Pemuco", "Penco", "Pinto", "Portezuelo", "Quilaco", "Quilleco", "Quillon", "Quirihue", "Ránquil", "San Carlos", "San Fabián", "San Nicolás", "San Pedro de la Paz", "San Rosendo", "Santa Bárbara", "Santa Juana", "Talcahuano", "Tirúa", "Tome", "Treguaco", "Tucapel", "Yumbel", "Yungay"],
+    "IX - La Araucanía": ["Angol", "Carahue", "Cholchol", "Collipulli", "Cunco", "Curacautin", "Curarrehue", "Ercilla", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Lonquimay", "Los Sauces", "Lumaco", "Melipeuco", "Nueva Imperial", "Padre Las Casas", "Perquenco", "Pitrufquén", "Pucon", "Purén", "Renaico", "Saavedra", "Temuco", "Teodoro Schmidt", "Toltén", "Traiguén", "Victoria", "Vilcún", "Villarrica"],
+    "X - Los Lagos": ["Ancud", "Calbuco", "Castro", "Chaitén", "Chonchi", "Cochamó", "Curaco de Vélez", "Dalcahue", "Fresia", "Frutillar", "Futaleufú", "Hualaihué", "Llanquihue", "Los Muermos", "Maullin", "Osorno", "Palena", "Puerto Montt", "Puerto Octay", "Puerto Varas", "Puqueldón", "Purranque", "Puyehue", "Queilén", "Quellon", "Quemchi", "Quinchao", "Rio Negro", "San Juan de la Costa", "San Pablo"],
+    "XI - Aysén del General Carlos Ibáñez del Campo": ["Aysen", "Chile Chico", "Cisnes", "Cochrane", "Coyhaique", "Guaitecas", "Lago Verde", "O'Higgins", "Río Ibáñez", "Tortel"],
+    "XII - Magallanes y de la Antártica Chilena": ["Antártica", "Cabo de Hornos", "Laguna Blanca", "Natales", "Porvenir", "Primavera", "Punta Arenas", "Río Verde", "San Gregorio", "Timaukel", "Torres del Paine"],
+    "XIV - Los Ríos": ["Corral", "Futrono", "La Unión", "Lago Ranco", "Lanco", "Los Lagos", "Mafil", "Paillaco", "Panguipulli", "Rio Bueno", "San Jose de la Mariquina", "Valdivia"],
+    "XV - Arica y Parinacota": ["Arica", "Camarones", "General Lagos", "Putre"],
+    "RM - Metropolitana de Santiago": ["Alhué", "Buin", "Calera de Tango", "Cerrillos", "Cerro Navia", "Colina", "Conchalí", "Curacaví", "El Bosque", "El Monte", "Estación Central", "Huechuraba", "Independencia", "Isla de Maipo", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Lampa", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "María Pinto", "Melipilla", "Ñuñoa", "Padre Hurtado", "Paine", "Pedro Aguirre Cerda", "Peñaflor", "Peñalolén", "Pirque", "Providencia", "Pudahuel", "Puente Alto", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Bernardo", "San Joaquín", "San José de Maipo", "San Miguel", "San Pedro", "San Ramón", "Santiago", "Talagante", "Tiltil", "Vitacura"]
+  };
 
-  // Obtener comunas filtradas por región
-  const comunas = useMemo(() => {
+  const comunasDisponibles = useMemo(() => {
     if (!selectedRegion) return [];
-    const filtered = deliveryData
-      .filter(item => item.region === selectedRegion)
-      .map(item => item.comuna);
-    return [...new Set(filtered)].sort();
+    return comunasPorRegion[selectedRegion] || [];
   }, [selectedRegion]);
 
-  // Obtener datos filtrados
-  const filteredData = useMemo(() => {
-    if (!selectedRegion || !selectedComuna) return [];
-    return deliveryData.filter(
-      item => item.region === selectedRegion && item.comuna === selectedComuna
-    );
+  const deliveryInfo = useMemo(() => {
+    if (!selectedRegion || !selectedComuna) return null;
+    
+    const regionKey = selectedRegion.split(" - ")[0];
+    const key = `${regionKey}-${selectedRegion.split(" - ")[1]}-${selectedComuna}`;
+    return deliveryData[key] || { regular: "SIN COBERTURA", express: null, stores: [] };
   }, [selectedRegion, selectedComuna]);
-
-  // Agrupar tiendas únicas
-  const tiendasUnicas = useMemo(() => {
-    const tiendas = filteredData.filter(item => item.tienda);
-    const uniqueMap = new Map();
-    tiendas.forEach(item => {
-      if (!uniqueMap.has(item.direccion)) {
-        uniqueMap.set(item.direccion, item);
-      }
-    });
-    return Array.from(uniqueMap.values());
-  }, [filteredData]);
-
-  // Obtener delivery regular
-  const deliveryRegular = useMemo(() => {
-    if (filteredData.length === 0) return null;
-    return filteredData[0].deliveryRegular;
-  }, [filteredData]);
-
-  // Obtener delivery express
-  const deliveryExpress = useMemo(() => {
-    if (filteredData.length === 0) return null;
-    const express = filteredData.find(item => item.pdv && item.nombrePdv);
-    return express;
-  }, [filteredData]);
 
   const handleClear = () => {
     setSelectedRegion('');
@@ -157,14 +315,19 @@ const DeliveryPanel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
-          Panel de Consulta de Entregas
-        </h1>
+        {/* Header */}
+        <div className="bg-blue-600 rounded-t-2xl p-6 shadow-lg">
+          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+            <Package className="w-8 h-8" />
+            Panel de Entregas Entel
+          </h1>
+          <p className="text-blue-100 mt-2">Consulta opciones de entrega para tu región</p>
+        </div>
 
         {/* Filtros */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div className="bg-white p-6 shadow-lg">
           <div className="grid md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -176,13 +339,11 @@ const DeliveryPanel = () => {
                   setSelectedRegion(e.target.value);
                   setSelectedComuna('');
                 }}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               >
                 <option value="">Seleccione una región</option>
-                {regiones.map((region) => (
-                  <option key={region} value={region}>
-                    {region}
-                  </option>
+                {regiones.map(region => (
+                  <option key={region} value={region}>{region}</option>
                 ))}
               </select>
             </div>
@@ -195,13 +356,11 @@ const DeliveryPanel = () => {
                 value={selectedComuna}
                 onChange={(e) => setSelectedComuna(e.target.value)}
                 disabled={!selectedRegion}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+                className="w-full p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition disabled:bg-gray-100 disabled:cursor-not-allowed"
               >
                 <option value="">Seleccione una comuna</option>
-                {comunas.map((comuna) => (
-                  <option key={comuna} value={comuna}>
-                    {comuna}
-                  </option>
+                {comunasDisponibles.map(comuna => (
+                  <option key={comuna} value={comuna}>{comuna}</option>
                 ))}
               </select>
             </div>
@@ -209,128 +368,92 @@ const DeliveryPanel = () => {
             <div className="flex items-end">
               <button
                 onClick={handleClear}
-                className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full p-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2"
               >
-                <X size={20} />
-                Borrar
+                <X className="w-5 h-5" />
+                Borrar Selección
               </button>
             </div>
           </div>
         </div>
 
         {/* Resultados */}
-        {selectedRegion && selectedComuna && (
-          <div className="space-y-6">
+        {deliveryInfo && (
+          <div className="bg-white rounded-b-2xl p-6 shadow-lg space-y-6">
             {/* Delivery Regular */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="border-2 border-blue-200 rounded-xl p-6 bg-blue-50">
               <div className="flex items-center gap-3 mb-4">
-                <Truck className="text-blue-600" size={28} />
-                <h2 className="text-2xl font-bold text-gray-800">Delivery Regular</h2>
+                <Clock className="w-6 h-6 text-blue-600" />
+                <h2 className="text-xl font-bold text-blue-900">Delivery Regular</h2>
               </div>
-              {deliveryRegular && deliveryRegular !== "SIN COBERTURA" ? (
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <p className="text-lg text-gray-700">
-                    <span className="font-semibold">Tiempo de entrega:</span> {deliveryRegular}
-                  </p>
-                </div>
-              ) : (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-gray-500">Sin cobertura en esta comuna</p>
-                </div>
-              )}
+              <div className="bg-white rounded-lg p-4">
+                <p className="text-lg font-semibold text-gray-800">
+                  {deliveryInfo.regular}
+                </p>
+              </div>
             </div>
 
             {/* Delivery Express */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="border-2 border-green-200 rounded-xl p-6 bg-green-50">
               <div className="flex items-center gap-3 mb-4">
-                <Package className="text-green-600" size={28} />
-                <h2 className="text-2xl font-bold text-gray-800">Delivery Express</h2>
+                <Package className="w-6 h-6 text-green-600" />
+                <h2 className="text-xl font-bold text-green-900">Delivery Express</h2>
               </div>
-              {deliveryExpress && deliveryExpress.expressWeekday ? (
+              
+              {deliveryInfo.express ? (
                 <div className="space-y-4">
-                  <div className="bg-green-50 rounded-lg p-4 border-l-4 border-green-500">
-                    <p className="text-xl font-bold text-green-700 mb-2">
-                      ⚡ Entrega en 2 horas
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-gray-600">PDV:</p>
-                        <p className="font-semibold text-gray-800">{deliveryExpress.pdv}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Tienda:</p>
-                        <p className="font-semibold text-gray-800">{deliveryExpress.nombrePdv}</p>
-                      </div>
-                    </div>
+                  <div className="bg-yellow-100 border-2 border-yellow-400 rounded-lg p-4 text-center">
+                    <p className="text-lg font-bold text-yellow-800">⚡ ENTREGA EN 2 HORAS ⚡</p>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Clock size={20} className="text-gray-600" />
-                      <h3 className="font-semibold text-gray-800">Horarios de servicio</h3>
+                  
+                  <div className="bg-white rounded-lg p-4 space-y-2">
+                    <div className="flex justify-between items-center border-b pb-2">
+                      <span className="font-semibold text-gray-700">PDV:</span>
+                      <span className="text-gray-900">{deliveryInfo.express.pdv}</span>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-3">
-                      <div>
-                        <p className="text-sm text-gray-600">Lunes a Viernes:</p>
-                        <p className="font-medium text-gray-800">{deliveryExpress.expressWeekday}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Sábado:</p>
-                        <p className="font-medium text-gray-800">
-                          {deliveryExpress.expressSaturday || 'Cerrado'}
-                        </p>
+                    <div className="flex justify-between items-center border-b pb-2">
+                      <span className="font-semibold text-gray-700">Tienda:</span>
+                      <span className="text-gray-900">{deliveryInfo.express.nombre}</span>
+                    </div>
+                    <div className="mt-4">
+                      <p className="font-semibold text-gray-700 mb-2">Horarios:</p>
+                      <div className="space-y-1 text-sm">
+                        <p><span className="font-medium">Lunes a Viernes:</span> {deliveryInfo.express.horarios.lv}</p>
+                        <p><span className="font-medium">Sábado:</span> {deliveryInfo.express.horarios.s}</p>
                       </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-gray-500">Sin cobertura express en esta comuna</p>
+                <div className="bg-white rounded-lg p-4 text-center">
+                  <p className="text-gray-600">SIN COBERTURA</p>
                 </div>
               )}
             </div>
 
             {/* Retiro en Tienda */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="border-2 border-purple-200 rounded-xl p-6 bg-purple-50">
               <div className="flex items-center gap-3 mb-4">
-                <Store className="text-purple-600" size={28} />
-                <h2 className="text-2xl font-bold text-gray-800">Retiro en Tienda</h2>
+                <Store className="w-6 h-6 text-purple-600" />
+                <h2 className="text-xl font-bold text-purple-900">Retiro en Tienda</h2>
               </div>
-              {tiendasUnicas.length > 0 ? (
-                <div className="grid gap-4">
-                  {tiendasUnicas.map((tienda, index) => (
-                    <div key={index} className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+              
+              {deliveryInfo.stores && deliveryInfo.stores.length > 0 ? (
+                <div className="space-y-4">
+                  {deliveryInfo.stores.map((store, index) => (
+                    <div key={index} className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition">
                       <div className="flex items-start gap-3">
-                        <MapPin className="text-purple-600 mt-1 flex-shrink-0" size={20} />
-                        <div className="flex-1">
-                          <h3 className="font-bold text-gray-800 text-lg mb-2">{tienda.tienda}</h3>
-                          <div className="space-y-2">
-                            <div>
-                              <p className="text-sm text-gray-600">Dirección:</p>
-                              <p className="text-gray-800">{tienda.direccion}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">PDV:</p>
-                              <p className="font-semibold text-gray-800">{tienda.pdvTienda}</p>
-                            </div>
-                            <div className="bg-white rounded p-3 mt-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Clock size={18} className="text-gray-600" />
-                                <p className="font-semibold text-gray-800">Horarios</p>
-                              </div>
-                              <div className="grid md:grid-cols-3 gap-2 text-sm">
-                                <div>
-                                  <p className="text-gray-600">Lunes a Viernes:</p>
-                                  <p className="font-medium text-gray-800">{tienda.horarioWeekday}</p>
-                                </div>
-                                <div>
-                                  <p className="text-gray-600">Sábado:</p>
-                                  <p className="font-medium text-gray-800">{tienda.horarioSaturday}</p>
-                                </div>
-                                <div>
-                                  <p className="text-gray-600">Domingo:</p>
-                                  <p className="font-medium text-gray-800">{tienda.horarioSunday}</p>
-                                </div>
-                              </div>
+                        <MapPin className="w-5 h-5 text-purple-600 mt-1 flex-shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <h3 className="font-bold text-lg text-gray-900">{store.nombre}</h3>
+                          <p className="text-gray-700">{store.direccion}</p>
+                          
+                          <div className="border-t pt-2 mt-2">
+                            <p className="text-sm font-semibold text-gray-700 mb-1">PDV: {store.pdv}</p>
+                            <div className="text-sm space-y-1">
+                              <p><span className="font-medium">Lunes a Viernes:</span> {store.horarios.lv}</p>
+                              <p><span className="font-medium">Sábado:</span> {store.horarios.s}</p>
+                              <p><span className="font-medium">Domingo:</span> {store.horarios.d}</p>
                             </div>
                           </div>
                         </div>
@@ -339,8 +462,8 @@ const DeliveryPanel = () => {
                   ))}
                 </div>
               ) : (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-gray-500">No hay tiendas disponibles en esta comuna</p>
+                <div className="bg-white rounded-lg p-4 text-center">
+                  <p className="text-gray-600">No hay tiendas disponibles en esta comuna</p>
                 </div>
               )}
             </div>
@@ -348,11 +471,9 @@ const DeliveryPanel = () => {
         )}
 
         {!selectedRegion && !selectedComuna && (
-          <div className="bg-white rounded-lg shadow-lg p-12 text-center">
-            <Package size={64} className="mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-500 text-lg">
-              Seleccione una región y comuna para ver las opciones de entrega
-            </p>
+          <div className="bg-white rounded-b-2xl p-12 shadow-lg text-center">
+            <Search className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+            <p className="text-xl text-gray-600">Selecciona una región y comuna para ver las opciones de entrega</p>
           </div>
         )}
       </div>
@@ -360,4 +481,4 @@ const DeliveryPanel = () => {
   );
 };
 
-export default DeliveryPanel;
+export default EntelDeliveryPanel
